@@ -1,0 +1,256 @@
+<html>
+  <head>
+    <!-- Include A-frame library, not good for production -->
+    <script src="https://unpkg.com/aframe@latest"></script>
+    <!-- Animation script for the 3D model -->
+    <script src="https://unpkg.com/aframe-extras@6.1.0/dist/aframe-extras.loaders.min.js"></script>
+    <!-- Environemt component script -->
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="src/styles/style.css" />
+    <!-- Component scripts -->
+    <script src="src/js/complete-level.js"></script>
+    <script src="src/js/riddle.js"></script>
+    <script src="src/js/box-game.js"></script>
+  </head>
+  <body>
+    <main>
+      <!-- RIDDLE GAME -->
+      <div class="popup hide riddle-game-container">
+        <div id="text"></div>
+        <div id="option-buttons"></div>
+        <div class="button-div">
+          <p class="esc">Press esc to click</p>
+          <button id="next-button" class="button">Next</button>
+          <button class="popup-button" onClick="closePopup()">Close</button>
+        </div>
+      </div>
+      <!-- END OF RIDDLE GAME -->
+
+      <!-- BOXES GAME-->
+      <div class="boxes-popup hide boxes-game-container">
+        <h3 id="boxes-title"></h3>
+        <p id="boxes-text"></p>
+        <div class="button-div">
+          <p class="esc">Press esc to click</p>
+          <button id="boxes-next-button" class="button">Next</button>
+          <button id="boxes-popup-button" onClick="closeBoxesPopup()">
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div class="not-found-popup hide">
+        <p>Hmm... The missing piece is not in this one, keep looking!</p>
+        <div class="button-div">
+          <p class="esc">Press esc to click</p>
+          <button
+            id="boxes-popup-button"
+            class="single-button"
+            onClick="closeNotFoundPopup()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+      <!-- END OF BOXES GAME-->
+
+      <!-- 3RD CHALLENGE POPUP -->
+      <div id="level-complete-popup" class="popup-style hide">
+        <p>You completed level 3!🥳 Go on to level 4.</p>
+        <div class="button-div">
+          <p class="esc">Press esc to click</p>
+          <button id="next-level-button" onClick="nextLevel()">
+            Next Level
+          </button>
+          <button
+            id="complete-popup-button"
+            onClick="closeLevelCompletePopup()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+      <!-- END OF 3RD CHALLENGE POPUP -->
+
+      <!-- Inside the scene is where all the a-frame things go, only one scene -->
+      <a-scene
+        vr-mode-ui="enabled: false"
+        class="scene boxes-scene"
+        vr-mode-ui
+        cursor="rayOrigin: mouse"
+        fog="color:  #796eab;  near:  0;  far:  19.81;  density:  0"
+        environment="preset:  goaland;  active:  true;  skyType:  gradient;  skyColor:  #000000;  horizonColor:  #9992f7;  lighting:  point;  shadow:  true;  lightPosition:  [object Object];  fog:  0.96;  groundTexture:  squares;  dressing:  trees;  dressingAmount:  300;  dressingVariance:  [object Object];  dressingScale:  6.7"
+      >
+        <a-assets>
+          <img id="concrete" src="src/assets/old-grunge-concrete.jpg" />
+          <a-asset-items
+            id="alien"
+            src="src/assets/alien/model.gltf"
+          ></a-asset-items>
+          <a-asset-items
+            id="arrow"
+            src="src/assets/arrow/model.gltf"
+          ></a-asset-items>
+          <a-asset-items
+            id="door"
+            src="src/assets/door/Door 2.gltf"
+          ></a-asset-items>
+          <a-asset-items
+            id="chest"
+            src="src/assets/chest/Treasure_Trunk_01.gltf"
+          ></a-asset-items>
+        </a-assets>
+
+        <a-light type="ambient" color="gray"></a-light>
+        <a-light type="point" intensity="2" position="0 0 -2"></a-light>
+        <a-sky color="#002746" id="sky"></a-sky>
+
+        <a-entity
+          gltf-model="#alien"
+          position="-0.5 -0.01 -4"
+          rotation="0 180 0"
+          scale="0.5 0.5 0.5"
+          shadow
+          target-marker
+          open-popup
+        ></a-entity>
+
+        <a-entity
+          gltf-model="#arrow"
+          scale="5 5 5"
+          rotation="0 0 90"
+          position="5.23 7.73 -3"
+        ></a-entity>
+
+        <a-entity
+          gltf-model="#door"
+          id="gate"
+          position="40 0 61.944"
+          scale="0.0075 0.0075 0.0075"
+          visible="false"
+          complete-level
+        ></a-entity>
+
+        <a-entity
+          gltf-model="#chest"
+          id="box-1"
+          class="closed"
+          position="-29 -0.02 1"
+          scale="-0.12 -0.12 -0.12"
+          rotation="0 180 180"
+          visible="false"
+          open-box
+        ></a-entity>
+
+        <a-entity
+          gltf-model="#chest"
+          id="box-2"
+          class="closed"
+          position="21 -0.02 7"
+          scale="-0.12 -0.12 -0.12"
+          rotation="0 0 180"
+          visible="false"
+          open-box
+        ></a-entity>
+
+        <a-entity
+          gltf-model="#chest"
+          id="box-3"
+          class="closed"
+          position="-1 -0.02 -47"
+          scale="-0.12 -0.12 -0.12"
+          rotation="0 180 180"
+          visible="false"
+          open-box
+        ></a-entity>
+
+        <!-- Cabin -->
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="roof"
+          position="40 0.01 65"
+          rotation="-90 0 0"
+          width="6"
+          height="6"
+          side="double"
+          visible="false"
+        ></a-plane>
+
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="floor"
+          position="40 3 65"
+          rotation="-90 0 0"
+          width="6"
+          height="6"
+          side="double"
+          visible="false"
+        ></a-plane>
+        <!-- Walls -->
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="wall-1"
+          position="40 1.5 68"
+          rotation="0 0 0"
+          width="6"
+          height="3"
+          side="double"
+          visible="false"
+        ></a-plane>
+
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="wall-2"
+          position="40 1.5 62"
+          rotation="0 0 0"
+          width="6"
+          height="3"
+          side="double"
+          visible="false"
+        ></a-plane>
+
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="wall-3"
+          position="43 1.5 65"
+          rotation="0 90 0"
+          width="6"
+          height="3"
+          side="double"
+          visible="false"
+        ></a-plane>
+
+        <a-plane
+          src="#concrete"
+          color="#181C26"
+          id="wall-4"
+          position="37 1.5 65"
+          rotation="0 90 0"
+          width="6"
+          height="3"
+          side="double"
+          visible="false"
+        ></a-plane>
+        <!-- End of cabin -->
+
+        <a-entity id="rig" movement-controls="speed: 0.1">
+          <a-entity
+            id="camera"
+            camera
+            position="0 1.6 0"
+            look-controls="pointerLockEnabled: true"
+            wasd-controls="acceleration:45"
+          >
+            <a-cursor id="cursor" raycaster></a-cursor>
+          </a-entity>
+        </a-entity>
+      </a-scene>
+    </main>
+  </body>
+</html>
